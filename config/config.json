@@ -1,0 +1,10 @@
+{
+	"nickname" : "myNickName",
+	"realName" : "myRealName",
+	"servers" : [ {
+		"name" : "server 1",
+		"network" : "localhost",
+		"port" : 6667,
+		"channels" : [ "#home", "#test2" ]
+	} ]
+}
