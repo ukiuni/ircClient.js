@@ -16,50 +16,46 @@
 <link rel="stylesheet" href="angular-ui-tree/dist/angular-ui-tree.min.css">
 <script src="angular-ui-tree/dist/angular-ui-tree.min.js"></script>
 <script src="ui-bootstrap-tpls-0.13.0.min.js"></script>
-<link rel="stylesheet" href="http://jimliu.github.io/angular-ui-tree/css/demo.css">
 <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
-	<div id="wrap">
-		<div id="contents" class="row">
-			<div class="col-xs-8" id="messageArea">
-				<div id="messageInnerArea">
-					<div ng-repeat="message in messages">
-						<div class="row">
-							<div class="col-xs-2">
-								<div>{{message.name}}</div>
-							</div>
-							<div class="col-xs-10">
-								<div>{{message.text}}</div>
-							</div>
+	<div id="contents" class="row">
+		<div class="col-xs-8" id="messageArea">
+			<div id="messageInnerArea">
+				<div ng-repeat="message in messages">
+					<div class="row">
+						<div class="col-xs-2">
+							<div ng-bind="message.name"></div>
+						</div>
+						<div class="col-xs-10">
+							<div ng-bind-html="message.text | highlight:myNickname"></div>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div class="col-xs-4" id="channelArea">
-				<div ui-tree>
-					<ol ui-tree-nodes="" ng-model="connections.servers">
-						<li ng-repeat="server in connections.servers" ui-tree-node>
-							<div ui-tree-handle>{{server.name}}</div>
-							<ol ui-tree-nodes="" ng-model="server.channels">
-								<li ng-repeat="channel in server.channels" ui-tree-node><span ng-click="changeMessage(server.network, channel)">{{channel}}</span></li>
-							</ol>
-						</li>
-					</ol>
-				</div>
-			</div>
-			<!-- channelArea -->
 		</div>
-		<!-- contents -->
-		<div id="footer">
-			<div class="input-group" style="width: 100%">
-				<input type="text" class="form-control" ng-model="newMessage" ng-keydown="handleKeydown($event)">
-				<div class="input-group-btn"></div>
+		<div class="col-xs-4" id="channelArea">
+			<div ui-tree>
+				<dl ui-tree-nodes="" ng-model="connections.servers">
+					<dt ng-repeat="server in connections.servers" ui-tree-node>
+						<div ui-tree-handle class="serverElement">{{server.name}}</div>
+						<dl ui-tree-nodes="" ng-model="server.channels">
+							<dt ng-repeat="channel in server.channels" ui-tree-node ng-click="selectChannel(server.network, channel)" class="channelElement" ng-class="{hasNewMessage: hasNewMessage(server.network, channel), isSelectChannel: isSelectChannel(server.network, channel),  hasNotificationMessage: hasNotificationMessage(server.network, channel)}">{{channel}}</dt>
+						</dl>
+					</dt>
+				</dl>
 			</div>
 		</div>
-		<!-- footer -->
+		<!-- channelArea -->
 	</div>
-	<!-- wrap -->
+	<!-- contents -->
+	<div id="inputArea">
+		<div class="input-group" style="width: 100%">
+			<input type="text" class="form-control" ng-model="newMessage" ng-keydown="handleKeydown($event)">
+			<div class="input-group-btn"></div>
+		</div>
+	</div>
+	<!-- inputArea -->
 </body>
 <script type="text/javascript" src="scripts/index.js"></script>
 </html>

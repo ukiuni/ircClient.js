@@ -12,6 +12,9 @@ function scrollIfNeeds() {
 		}, 0);
 	}
 }
+function sanitaize(str) {
+	return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+};
 if (!connections) {
 	connections = require("./config/config.json");
 }
@@ -38,11 +41,24 @@ angular.module('ircApp', []).controller('ircController', [ "$scope", function($s
 		// TODO
 	};
 
-	irc.changeMessage = function(host, channel) {
+	irc.selectChannel = function(host, channel) {
 		$scope.currentHost = host;
 		$scope.currentChannel = channel;
 		$scope.messages = messages[host + ":" + channel];
+		$scope.hasNewMessageMap[host + ":" + channel] = false;
+		$scope.hasNotificationMessageMap[host + ":" + channel] = false;
 	};
+	$scope.hasNewMessageMap = [];
+	$scope.hasNotificationMessageMap = [];
+	irc.hasNewMessage = function(host, channel) {
+		return ($scope.hasNewMessageMap[host + ":" + channel])
+	}
+	irc.hasNotificationMessage = function(host, channel) {
+		return ($scope.hasNotificationMessageMap[host + ":" + channel])
+	}
+	irc.isSelectChannel = function(host, channel) {
+		return $scope.currentHost == host && $scope.currentChannel == channel;
+	}
 	var messages = [];
 	for ( var i in $scope.connections.servers) {
 		var connectHost = $scope.connections.servers[i];
@@ -57,6 +73,13 @@ angular.module('ircApp', []).controller('ircController', [ "$scope", function($s
 					text : message
 				};
 				messages[host + ":" + channel].push(messageObj);
+				if (messages[host + ":" + channel] != $scope.messages) {
+					$scope.hasNewMessageMap[host + ":" + channel] = true;
+				}
+				// TODO valious notification message
+				if (message.indexOf($scope.myNickname) >= 0) {
+					$scope.hasNotificationMessageMap[host + ":" + channel] = true;
+				}
 				scrollIfNeeds();
 			});
 		});
@@ -65,4 +88,11 @@ angular.module('ircApp', []).controller('ircController', [ "$scope", function($s
 	$scope.currentChannel = $scope.connections.servers[0].channels[0];
 	$scope.messages = messages[$scope.currentHost + ":" + $scope.currentChannel];
 
+} ]).filter('highlight', [ "$sce", function($sce) {
+	return function(text, phrase) {
+		if (phrase) {
+			text = sanitaize(text).replace(new RegExp('(' + phrase + ')', 'gi'), '<span class="highlighted">$1</span>')
+		}
+		return $sce.trustAsHtml(text)
+	}
 } ]);

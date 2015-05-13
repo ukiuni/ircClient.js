@@ -5,13 +5,6 @@ html, body {
 	width: 100%;
 }
 
-#wrap {
-	width: 100%;
-	position: relative;
-	height: 100%;
-	min-height: 100%;
-}
-
 #contents {
 	height: 100%;
 	padding-bottom: 50px;
@@ -27,10 +20,32 @@ html, body {
 	overflow: scroll;
 }
 
-#footer {
+#inputArea {
 	background: white;
 	position: fixed;
 	bottom: 0;
 	width: 100%;
 	height: 40px;
+}
+
+.channelElement {
+	margin-left: 10px;
+	padding-left: 5px;
+	border-radius: 5px;
+}
+
+.hasNewMessage {
+	background-color: #EFF;
+}
+
+.isSelectChannel {
+	background-color: #EEF;
+}
+
+.hasNotificationMessage {
+	background-color: #FEE;
+}
+
+.highlighted {
+	color: #F33;
 }
