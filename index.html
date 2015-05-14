@@ -19,7 +19,7 @@
 <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
-	<div id="contents" class="row">
+	<div id="upperContents" class="row">
 		<div class="col-xs-8" id="messageArea">
 			<div id="messageInnerArea">
 				<div ng-repeat="message in messages">
@@ -34,6 +34,34 @@
 				</div>
 			</div>
 		</div>
+		<div class="col-xs-4" id="userArea">
+			<div ui-tree>
+				<div ng-repeat="user in users[currentHost + ':' + currentChannel]">{{user.nickname}}</div>
+			</div>
+		</div>
+		<!-- downnerContents -->
+	</div>
+	<!-- contents -->
+	<div id="inputArea">
+		<div class="input-group" style="width: 100%">
+			<input type="text" class="form-control" ng-model="newMessage" ng-keydown="handleKeydown($event)">
+			<div class="input-group-btn"></div>
+		</div>
+	</div>
+	<!-- inputArea -->
+	<div id="downnerContents" class="row">
+		<div class="col-xs-8" id="logArea">
+			<div id="logInnerArea">
+				<div ng-repeat="log in logs">
+					<div class="row">
+						<div class="col-xs-12">
+							<div ng-bind-html="log | highlight:myNickname"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- logArea -->
 		<div class="col-xs-4" id="channelArea">
 			<div ui-tree>
 				<dl ui-tree-nodes="" ng-model="connections.servers">
@@ -48,14 +76,6 @@
 		</div>
 		<!-- channelArea -->
 	</div>
-	<!-- contents -->
-	<div id="inputArea">
-		<div class="input-group" style="width: 100%">
-			<input type="text" class="form-control" ng-model="newMessage" ng-keydown="handleKeydown($event)">
-			<div class="input-group-btn"></div>
-		</div>
-	</div>
-	<!-- inputArea -->
 </body>
 <script type="text/javascript" src="scripts/index.js"></script>
 </html>
