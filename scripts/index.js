@@ -12,6 +12,20 @@ function scrollIfNeeds() {
 		}, 0);
 	}
 }
+function showNotificationIfNeeds(title, text, callback) {
+	if (!document.hasFocus()) {
+		var notifyWindow = new Notification(title, {
+			icon : "",
+			body : text
+		});
+		notifyWindow.onclick = function() {
+			window.focus();
+			if (callback) {
+				callback();
+			}
+		};
+	}
+}
 function sanitaize(str) {
 	return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 };
@@ -116,7 +130,7 @@ angular.module('ircApp', []).controller('ircController', [ "$scope", function($s
 							name : message.args[0],
 							text : message.args[2]
 						};
-					} else if("PRIVMSG" == message.rawCommand){
+					} else if ("PRIVMSG" == message.rawCommand) {
 						channel = message.args[0];
 						messageObj = {
 							name : message.nick,
@@ -132,6 +146,11 @@ angular.module('ircApp', []).controller('ircController', [ "$scope", function($s
 						$scope.hasNotificationMessageMap[host + ":" + channel] = true;
 					}
 					scrollIfNeeds();
+					showNotificationIfNeeds("[" + messageObj.name + " → " + channel + "]", messageObj.text, function() {
+						$scope.$apply(function() {
+							irc.selectChannel(host, channel);
+						});
+					});
 				} else if (353 == message.rawCommand) {
 					var channel = message.args[2];
 					userJoined(host, channel, message.args[3]);
@@ -145,6 +164,8 @@ angular.module('ircApp', []).controller('ircController', [ "$scope", function($s
 				message.time = new Date();
 				$scope.logs.push(JSON.stringify(message));
 			});
+		}, function(host, error) {
+
 		});
 	}
 	$scope.currentHost = $scope.connections.servers[0].network;
