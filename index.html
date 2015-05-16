@@ -25,10 +25,10 @@
 				<div ng-repeat="message in messages">
 					<div class="row">
 						<div class="col-xs-2">
-							<div ng-bind="message.name"></div>
+							<div class="messageName" ng-bind="message.name"></div>
 						</div>
 						<div class="col-xs-10">
-							<div ng-bind-html="message.text | highlight:myNickname"></div>
+							<div class="messageText" ng-bind-html="message.text | highlight:myNickname"></div>
 						</div>
 					</div>
 				</div>
@@ -36,7 +36,9 @@
 		</div>
 		<div class="col-xs-4" id="userArea">
 			<div ui-tree>
-				<div ng-repeat="user in users[currentHost + ':' + currentChannel]">{{user.nickname}}</div>
+				<div ng-repeat="user in users[currentHost + ':' + currentChannel]">
+					<div ng-bind="user"></div>
+				</div>
 			</div>
 		</div>
 		<!-- downnerContents -->
@@ -66,9 +68,9 @@
 			<div ui-tree>
 				<dl ui-tree-nodes="" ng-model="connections.servers">
 					<dt ng-repeat="server in connections.servers" ui-tree-node>
-						<div ui-tree-handle class="serverElement">{{server.name}}</div>
+						<div ui-tree-handle class="serverElement" ng-bind="server.name"></div>
 						<dl ui-tree-nodes="" ng-model="server.channels">
-							<dt ng-repeat="channel in server.channels" ui-tree-node ng-click="selectChannel(server.network, channel)" class="channelElement" ng-class="{hasNewMessage: hasNewMessage(server.network, channel), isSelectChannel: isSelectChannel(server.network, channel),  hasNotificationMessage: hasNotificationMessage(server.network, channel)}">{{channel}}</dt>
+							<dt ng-repeat="channel in server.channels" ui-tree-node ng-click="selectChannel(server.network, channel)" class="channelElement" ng-class="{hasNewMessage: hasNewMessage(server.network, channel), isSelectChannel: isSelectChannel(server.network, channel),  hasNotificationMessage: hasNotificationMessage(server.network, channel)}" ng-bind="channel"></dt>
 						</dl>
 					</dt>
 				</dl>

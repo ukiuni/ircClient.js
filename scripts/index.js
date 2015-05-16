@@ -6,7 +6,7 @@ var connections = preference.load("CONNECTIONS");
 function scrollIfNeeds() {
 	var scrollHeight = $("#messageInnerArea").height();
 	var scrollPosition = $("#messageArea").height() + $("#messageArea").scrollTop();
-	if ((scrollHeight - scrollPosition) / scrollHeight === 0) {
+	if ((scrollHeight - scrollPosition) < 20) {
 		setTimeout(function() {
 			$("#messageArea").scrollTop($("#messageInnerArea").height());
 		}, 0);
@@ -68,17 +68,61 @@ angular.module('ircApp', []).controller('ircController', [ "$scope", function($s
 			var channel = connectHost.channels[j];
 			messages[connectHost.network + ":" + channel] = [];
 		}
-		ircConnector.connect($scope.myNickname, connectHost.network, connectHost.channels, function(host, message) {
-			$scope.$apply(function() {
-				if (!message) {
-					return;
+		function userJoined(host, channel, nick) {
+			var users = $scope.users[host + ":" + channel];
+			if (!users) {
+				users = [];
+				$scope.users[host + ":" + channel] = users;
+			}
+			var isThere = false;
+			for ( var key in users) {
+				if (nick == users[key]) {
+					isThere = true;
+					break;
 				}
-				if (331 == message.rawCommand) {
+			}
+			if (!isThere) {
+				users.push(nick);
+				users.sort();
+			}
+		}
+		function userParted(host, channel, nick) {
+			var users = $scope.users[host + ":" + channel];
+			if (users) {
+				var i = 0;
+				for ( var key in users) {
+					if (nick == users[key]) {
+						users.splice(i, 1)
+					} else {
+						i++;
+					}
+				}
+			}
+		}
+		ircConnector.connect($scope.myNickname, connectHost.network, connectHost.channels, function(host, message) {
+			if (!message) {
+				return;
+			}
+			if ("PING" == message.rawCommand) {
+				return;
+			}
+			$scope.$apply(function() {
+				if ("PRIVMSG" == message.rawCommand) {
 					var channel = message.args[1];
-					var messageObj = {
-						name : message.args[0],
-						text : message.args[2]
-					};
+					var messageObj
+					if (331 == message.rawCommand) {
+						channel = message.args[1];
+						messageObj = {
+							name : message.args[0],
+							text : message.args[2]
+						};
+					} else if("PRIVMSG" == message.rawCommand){
+						channel = message.args[0];
+						messageObj = {
+							name : message.nick,
+							text : message.args[1]
+						};
+					}
 					messages[host + ":" + channel].push(messageObj);
 					if (messages[host + ":" + channel] != $scope.messages) {
 						$scope.hasNewMessageMap[host + ":" + channel] = true;
@@ -88,7 +132,17 @@ angular.module('ircApp', []).controller('ircController', [ "$scope", function($s
 						$scope.hasNotificationMessageMap[host + ":" + channel] = true;
 					}
 					scrollIfNeeds();
+				} else if (353 == message.rawCommand) {
+					var channel = message.args[2];
+					userJoined(host, channel, message.args[3]);
+				} else if ("JOIN" === message.rawCommand) {
+					var channel = message.args[0];
+					userJoined(host, channel, message.nick);
+				} else if ("PART" === message.rawCommand) {
+					var channel = message.args[0];
+					userParted(host, channel, message.nick);
 				}
+				message.time = new Date();
 				$scope.logs.push(JSON.stringify(message));
 			});
 		});
@@ -99,7 +153,7 @@ angular.module('ircApp', []).controller('ircController', [ "$scope", function($s
 
 } ]).filter('highlight', [ "$sce", function($sce) {
 	return function(text, phrase) {
-		if(!text){
+		if (!text) {
 			return "";
 		}
 		if (phrase) {

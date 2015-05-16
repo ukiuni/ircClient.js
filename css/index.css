@@ -3,6 +3,8 @@ html, body {
 	padding: 0;
 	height: 100%;
 	width: 100%;
+	font-size: 12px;
+	color: #333;
 }
 
 #upperContents {
@@ -13,6 +15,13 @@ html, body {
 #messageArea {
 	height: 100%;
 	overflow: scroll;
+}
+
+.messageName {
+	color: #006;
+}
+
+.messageText {
 }
 
 #channelArea {
@@ -33,6 +42,7 @@ html, body {
 	height: 100%;
 	overflow: scroll;
 }
+
 #inputArea {
 	background: white;
 	position: fixed;
