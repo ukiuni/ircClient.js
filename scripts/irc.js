@@ -15,9 +15,11 @@ var exports = {
 			});
 			hostMap[host] = client;
 		}
-		client.addListener('message', function(from, to, message) {
-			callback(host, from, to, message);
-		});
+		if (callback) {
+			client.addListener('raw', function(message) {
+				callback(host, message);
+			});
+		}
 	},
 	say : function(host, channel, message) {
 		hostMap[host].say(channel, message);
