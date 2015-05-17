@@ -1,25 +1,109 @@
-// アプリケーションのライフサイクルをコントロールするモジュール
 var app = require('app');
-// アプリケーションのウィンドウを作成するためのモジュール
 var Window = require('browser-window');
-// GCで回収されないようにメインウィンドウはグローバル領域で宣言します。
+var Menu = require('menu');
 var mainWindow = null;
-// Electronの初期化が完了したら呼び出されます。
 app.on('ready', function() {
-	// 画面を表示します。
 	mainWindow = new Window({
 		width : 800,
 		height : 600
 	});
-	
-	// 画面の内容となるHTMLファイルをロードします。
+
 	mainWindow.loadUrl('file://' + __dirname + '/index.html');
-	//mainWindow.loadUrl('about://blank');
-	mainWindow.closeDevTools()
-	mainWindow.openDevTools();
-	console.log("url loaded");
-	// ウィンドウが閉じられたら、アプリも終了するようにします。
+
+	Menu.setApplicationMenu(menu);
 	mainWindow.on('closed', function() {
 		app.quit();
 	});
 });
+var template = [ {
+	label : 'Electron',
+	submenu : [ {
+		label : 'About Electron',
+		selector : 'orderFrontStandardAboutPanel:'
+	}, {
+		type : 'separator'
+	}, {
+		label : 'Services',
+		submenu : []
+	}, {
+		type : 'separator'
+	}, {
+		label : 'Hide Electron',
+		accelerator : 'Command+H',
+		selector : 'hide:'
+	}, {
+		label : 'Hide Others',
+		accelerator : 'Command+Shift+H',
+		selector : 'hideOtherApplications:'
+	}, {
+		label : 'Show All',
+		selector : 'unhideAllApplications:'
+	}, {
+		type : 'separator'
+	}, {
+		label : 'Quit',
+		accelerator : 'Command+Q',
+		click : function() {
+			app.quit();
+		}
+	}, ]
+}, {
+	label : 'Edit',
+	submenu : [ {
+		label : 'Undo',
+		accelerator : 'Command+Z',
+		selector : 'undo:'
+	}, {
+		label : 'Redo',
+		accelerator : 'Shift+Command+Z',
+		selector : 'redo:'
+	}, {
+		type : 'separator'
+	}, {
+		label : 'Cut',
+		accelerator : 'Command+X',
+		selector : 'cut:'
+	}, {
+		label : 'Copy',
+		accelerator : 'Command+C',
+		selector : 'copy:'
+	}, {
+		label : 'Paste',
+		accelerator : 'Command+V',
+		selector : 'paste:'
+	}, {
+		label : 'Select All',
+		accelerator : 'Command+A',
+		selector : 'selectAll:'
+	}, ]
+}, {
+	label : 'View',
+	submenu : [ {
+		label : 'Toggle DevTools',
+		accelerator : 'Alt+Command+I',
+		click : function() {
+			Window.getFocusedWindow().toggleDevTools();
+		}
+	} ]
+}, {
+	label : 'Window',
+	submenu : [ {
+		label : 'Minimize',
+		accelerator : 'Command+M',
+		selector : 'performMiniaturize:'
+	}, {
+		label : 'Close',
+		accelerator : 'Command+W',
+		selector : 'performClose:'
+	}, {
+		type : 'separator'
+	}, {
+		label : 'Bring All to Front',
+		selector : 'arrangeInFront:'
+	}, ]
+}, {
+	label : 'Help',
+	submenu : []
+}, ];
+
+var menu = Menu.buildFromTemplate(template);
