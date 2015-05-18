@@ -41,7 +41,8 @@ angular.module('ircApp', [ 'ng-context-menu' ]).controller('ircController', [ "$
 			ircConnector.say($scope.currentHost, $scope.currentChannel, $scope.newMessage);
 			$scope.messages.push({
 				name : $scope.myNickname,
-				text : $scope.newMessage
+				text : $scope.newMessage,
+				date : new Date()
 			});
 			scrollIfNeeds();
 			$scope.newMessage = '';
@@ -154,7 +155,8 @@ angular.module('ircApp', [ 'ng-context-menu' ]).controller('ircController', [ "$
 						}
 						messageObj = {
 							name : message.nick,
-							text : message.args[1]
+							text : message.args[1],
+							date : new Date()
 						};
 					}
 					if (!messages[host + ":" + channel]) {
