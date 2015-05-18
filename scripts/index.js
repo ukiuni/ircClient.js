@@ -135,12 +135,26 @@ angular.module('ircApp', []).controller('ircController', [ "$scope", function($s
 						};
 					} else if ("PRIVMSG" == message.rawCommand) {
 						channel = message.args[0];
+						if ($scope.myNickname == channel) {
+							channel = message.nick;
+						}
 						messageObj = {
 							name : message.nick,
 							text : message.args[1]
 						};
 					}
+					if (!messages[host + ":" + channel]) {
+						messages[host + ":" + channel] = [];
+						for ( var serverKey in $scope.connections.servers) {
+							var server = $scope.connections.servers[serverKey];
+							if (host == server.network) {
+								server.channels.push(channel);
+								break;
+							}
+						}
+					}
 					messages[host + ":" + channel].push(messageObj);
+
 					if (messages[host + ":" + channel] != $scope.messages) {
 						$scope.hasNewMessageMap[host + ":" + channel] = true;
 					}
