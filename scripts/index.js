@@ -82,23 +82,26 @@ angular.module('ircApp', []).controller('ircController', [ "$scope", function($s
 			var channel = connectHost.channels[j];
 			messages[connectHost.network + ":" + channel] = [];
 		}
-		function userJoined(host, channel, nick) {
+		function userJoined(host, channel, nicks) {
 			var users = $scope.users[host + ":" + channel];
 			if (!users) {
 				users = [];
 				$scope.users[host + ":" + channel] = users;
 			}
-			var isThere = false;
-			for ( var key in users) {
-				if (nick == users[key]) {
-					isThere = true;
-					break;
+			for ( var nickKey in nicks) {
+				var nick = nicks[nickKey];
+				var isThere = false;
+				for ( var key in users) {
+					if (nick == users[key]) {
+						isThere = true;
+						break;
+					}
+				}
+				if (!isThere) {
+					users.push(nick);
 				}
 			}
-			if (!isThere) {
-				users.push(nick);
-				users.sort();
-			}
+			users.sort();
 		}
 		function userParted(host, channel, nick) {
 			var users = $scope.users[host + ":" + channel];
@@ -153,10 +156,10 @@ angular.module('ircApp', []).controller('ircController', [ "$scope", function($s
 					});
 				} else if (353 == message.rawCommand) {
 					var channel = message.args[2];
-					userJoined(host, channel, message.args[3]);
+					userJoined(host, channel, message.args[3].split(" "));
 				} else if ("JOIN" === message.rawCommand) {
 					var channel = message.args[0];
-					userJoined(host, channel, message.nick);
+					userJoined(host, channel, [ message.nick ]);
 				} else if ("PART" === message.rawCommand) {
 					var channel = message.args[0];
 					userParted(host, channel, message.nick);
