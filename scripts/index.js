@@ -32,7 +32,7 @@ function sanitaize(str) {
 if (!connections) {
 	connections = require("./config/config.json");
 }
-angular.module('ircApp', []).controller('ircController', [ "$scope", function($scope) {
+angular.module('ircApp', [ 'ng-context-menu' ]).controller('ircController', [ "$scope", function($scope) {
 	var irc = $scope;
 	$scope.connections = connections;
 	$scope.myNickname = connections.nickname;
@@ -72,6 +72,20 @@ angular.module('ircApp', []).controller('ircController', [ "$scope", function($s
 	}
 	irc.isSelectChannel = function(host, channel) {
 		return $scope.currentHost == host && $scope.currentChannel == channel;
+	}
+	irc.startPrivateMessage = function(host, user, notShow) {
+		messages[host + ":" + user] = [];
+		for ( var serverKey in $scope.connections.servers) {
+			var server = $scope.connections.servers[serverKey];
+			if (host == server.network) {
+				server.channels.push(user);
+				break;
+			}
+		}
+		$scope.users[host + ":" + user] = [ user ];
+		if (!notShow) {
+			irc.selectChannel(host, user);
+		}
 	}
 	$scope.logs = [];
 	$scope.users = [];
@@ -144,14 +158,7 @@ angular.module('ircApp', []).controller('ircController', [ "$scope", function($s
 						};
 					}
 					if (!messages[host + ":" + channel]) {
-						messages[host + ":" + channel] = [];
-						for ( var serverKey in $scope.connections.servers) {
-							var server = $scope.connections.servers[serverKey];
-							if (host == server.network) {
-								server.channels.push(channel);
-								break;
-							}
-						}
+						irc.startPrivateMessage(host, channel, true);
 					}
 					messages[host + ":" + channel].push(messageObj);
 
