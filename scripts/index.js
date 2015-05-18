@@ -184,6 +184,18 @@ angular.module('ircApp', [ 'ng-context-menu' ]).controller('ircController', [ "$
 				} else if ("PART" === message.rawCommand) {
 					var channel = message.args[0];
 					userParted(host, channel, message.nick);
+				} else if ("NICK" === message.rawCommand) {
+					var oldNick = message.nick;
+					var newNick = message.args[0];
+					for ( var userArrayKey in $scope.users) {
+						if (userArrayKey.lastIndexOf(host + ":", 0) === 0) {
+							for ( var userKey in $scope.users[userArrayKey]) {
+								if (oldNick === $scope.users[userArrayKey][userKey]) {
+									$scope.users[userArrayKey][userKey] = newNick;
+								}
+							}
+						}
+					}
 				}
 				message.time = new Date();
 				$scope.logs.push(JSON.stringify(message));
