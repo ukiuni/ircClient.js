@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="angular-ui-tree/dist/angular-ui-tree.min.css">
 <script src="angular-ui-tree/dist/angular-ui-tree.min.js"></script>
 <script src="ui-bootstrap-tpls-0.13.0.min.js"></script>
+<script src="ng-context-menu.js"></script>
 <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
@@ -37,7 +38,12 @@
 		<div class="col-xs-4" id="userArea">
 			<div ui-tree>
 				<div ng-repeat="user in users[currentHost + ':' + currentChannel]">
-					<div ng-bind="user"></div>
+					<div context-menu data-target="menu-{{ $index }}" ng-bind="user"></div>
+					<div class="dropdown position-fixed" id="menu-{{ $index }}">
+						<ul class="dropdown-menu" role="menu">
+							<li><a class="pointer" role="menuitem" tabindex="1" ng-click="startPrivateMessage(currentHost, user)"> Private Message</a></li>
+						</ul>
+					</div>
 				</div>
 			</div>
 		</div>

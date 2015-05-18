@@ -22,6 +22,7 @@ html, body {
 }
 
 .messageText {
+	
 }
 
 #channelArea {
@@ -71,4 +72,8 @@ html, body {
 
 .highlighted {
 	color: #F33;
+}
+
+.position-fixed {
+	position: fixed;
 }
