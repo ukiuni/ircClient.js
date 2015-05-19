@@ -54,14 +54,23 @@ angular.module('ircApp', [ 'ng-context-menu' ]).controller('ircController', [ "$
 	irc.removeServer = function(server) {
 		// TODO
 	};
-
+	function saveOldScrollTop(host, channel) {
+		$scope.scrollTopsMap[host + ":" + channel] = $("#messageInnerArea").height() - $("#messageArea").scrollTop();
+	}
 	irc.selectChannel = function(host, channel) {
+		saveOldScrollTop($scope.currentHost, $scope.currentChannel);
 		$scope.currentHost = host;
 		$scope.currentChannel = channel;
 		$scope.messages = messages[host + ":" + channel];
 		$scope.hasNewMessageMap[host + ":" + channel] = false;
 		$scope.hasNotificationMessageMap[host + ":" + channel] = false;
+		setTimeout(function() {
+			$scope.$apply(function() {
+				$("#messageArea").scrollTop($("#messageInnerArea").height() - $scope.scrollTopsMap[host + ":" + channel]);
+			});
+		}, 0);
 	};
+	$scope.scrollTopsMap = []
 	$scope.hasNewMessageMap = [];
 	$scope.hasNotificationMessageMap = [];
 	irc.hasNewMessage = function(host, channel) {
