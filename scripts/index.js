@@ -81,12 +81,47 @@ angular.module('ircApp', [ 'ng-context-menu', 'ui.bootstrap' ]).controller('ircC
 		}, function() {
 		});
 	}
+
+	function openConfirmDialog(message, callback) {
+		var dialogController = [ "$scope", "$modalInstance", function($scope, $modalInstance) {
+			$scope.message = message;
+			$scope.save = function() {
+				$modalInstance.close({
+					func : "save",
+					item : $scope.argument
+				});
+			}
+		} ];
+		var modalInstance = $modal.open({
+			templateUrl : 'confirmDialog.html?time=' + new Date().getTime(),
+			controller : dialogController,
+		});
+		modalInstance.result.then(function(res) {
+			if ("save" == res.func) {
+				callback(res.item);
+			}
+		}, function() {
+		});
+	}
+
 	$scope.openAddChannelDialog = function(host) {
 		openOneValueDialog("Add channel to " + host, "channel", function(channel) {
 			if (channel.lastIndexOf("#", 0) !== 0) {
 				channel = "#" + channel;
 			}
 			irc.addChannel(host, channel);
+		})
+	}
+
+	$scope.openRemoveServerDialog = function(host) {
+		openConfirmDialog("Delete host \"" + host + "\" ?", function() {
+			irc.removeServer(host);
+		})
+	}
+
+	$scope.openDeleteChannelDialog = function(host, channel) {
+		openConfirmDialog("Delete channel \"" + channel + "\" ?", function() {
+			irc.removeChannel(host, channel);
 		})
 	}
 
@@ -109,23 +144,30 @@ angular.module('ircApp', [ 'ng-context-menu', 'ui.bootstrap' ]).controller('ircC
 		});
 		modalInstance.result.then(function(res) {
 			if ("save" == res.func) {
-				var newServer = {};
-				newServer.name = res.item.name;
-				newServer.network = res.item.network;
-				newServer.port = parseInt(res.item.port);
-				newServer.channels = [];
-				$scope.connections.servers.push(newServer);
-				preference.save("CONNECTIONS", $scope.connections);
+				irc.addServer(res.item);
 			}
 		}, function() {
 		});
 	}
 	irc.addServer = function(server) {
-		// TODO
+		var newServer = {};
+		newServer.name = server.name;
+		newServer.network = server.network;
+		newServer.port = parseInt(server.port);
+		newServer.channels = [];
+		$scope.connections.servers.push(newServer);
+		preference.save("CONNECTIONS", $scope.connections);
 	};
 
-	irc.removeServer = function(server) {
-		// TODO
+	irc.removeServer = function(host) {
+		for ( var serverKey in $scope.connections.servers) {
+			if ($scope.connections.servers[serverKey].network == host) {
+				delete $scope.connections.servers[serverKey];
+				preference.save("CONNECTIONS", $scope.connections);
+				ircConnector.disconnect(host);
+				return;
+			}
+		}
 	};
 
 	irc.addChannel = function(host, channel) {
@@ -133,7 +175,7 @@ angular.module('ircApp', [ 'ng-context-menu', 'ui.bootstrap' ]).controller('ircC
 		if (server) {
 			var isThere = false;
 			for ( var i in server.channels) {
-				if (server.channels == channel) {
+				if (server.channels[i] == channel) {
 					isThere = true;
 					break;
 				}
@@ -150,9 +192,20 @@ angular.module('ircApp', [ 'ng-context-menu', 'ui.bootstrap' ]).controller('ircC
 		}
 	};
 
-	irc.removeChannel = function(server, channel) {
-		// TODO
+	irc.removeChannel = function(host, channel) {
+		var server = findServerFromList(host);
+		if (server) {
+			for ( var i in server.channels) {
+				if (server.channels[i] == channel) {
+					delete server.channels[i];
+					ircConnector.part(host, channel);
+					preference.save("CONNECTIONS", $scope.connections);
+					return;
+				}
+			}
+		}
 	};
+
 	function findServerFromList(host) {
 		for ( var serverKey in $scope.connections.servers) {
 			var server = $scope.connections.servers[serverKey];

@@ -21,11 +21,17 @@ var exports = {
 			});
 		}
 	},
+	disconnect : function(host) {
+		hostMap[host].disconnect();
+	},
 	say : function(host, channel, message) {
 		hostMap[host].say(channel, message);
 	},
 	join : function(host, channel) {
 		hostMap[host].join(channel);
+	},
+	part : function(host, channel) {
+		hostMap[host].part(channel);
 	}
 };
 

@@ -1,0 +1,9 @@
+<div class="modal-body">
+	<div class="row">
+		<div>{{message}}</div>
+	</div>
+</div>
+<div class="modal-footer">
+	<button type="button" id="closeButton" class="btn btn-default" ng-click="$dismiss()">Cancel</button>
+	<button type="button" id="saveButton" class="btn btn-primary" ng-disabled="'' == argument" ng-click="save()">OK</button>
+</div>
