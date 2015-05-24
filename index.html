@@ -43,7 +43,7 @@
 					<div context-menu data-target="userMenu-{{ $index }}" ng-bind="user"></div>
 					<div class="dropdown position-fixed" id="userMenu-{{ $index }}">
 						<ul class="dropdown-menu" role="menu">
-							<li><a class="pointer" role="menuitem" tabindex="1" ng-click="startPrivateMessage(currentHost, user)"> Private Message</a></li>
+							<li><a class="pointer" role="menuitem" tabindex="1" ng-click="startPrivateMessage(currentHost, user)">Private Message</a></li>
 						</ul>
 					</div>
 				</div>
@@ -78,11 +78,19 @@
 					<div context-menu data-target="serverMenu-{{ $index }}" class="serverElement" ng-bind="server.name"></div>
 					<div class="dropdown position-fixed" id="serverMenu-{{ $index }}">
 						<ul class="dropdown-menu" role="menu">
+							<li><a class="pointer" role="menuitem" tabindex="1" ng-click="openRemoveServerDialog(server.network)">Remove Serverl</a></li>
 							<li><a class="pointer" role="menuitem" tabindex="1" ng-click="openAddChannelDialog(server.network)">Add channel</a></li>
 						</ul>
 					</div>
 					<dl>
-						<dt ng-repeat="channel in server.channels track by $index" ng-click="selectChannel(server.network, channel)" class="channelElement" ng-class="{hasNewMessage: hasNewMessage(server.network, channel), isSelectChannel: isSelectChannel(server.network, channel),  hasNotificationMessage: hasNotificationMessage(server.network, channel)}" ng-bind="channel"></dt>
+						<div context-menu data-target="channelMenu-{{ $index }}" ng-repeat="channel in server.channels track by $index">
+							<dt ng-click="selectChannel(server.network, channel)" class="channelElement" ng-class="{hasNewMessage: hasNewMessage(server.network, channel), isSelectChannel: isSelectChannel(server.network, channel),  hasNotificationMessage: hasNotificationMessage(server.network, channel)}" ng-bind="channel"></dt>
+							<div class="dropdown position-fixed" id="channelMenu-{{ $index }}">
+								<ul class="dropdown-menu" role="menu">
+									<li><a class="pointer" role="menuitem" tabindex="1" ng-click="openDeleteChannelDialog(server.network, channel)">Remove Channel</a></li>
+								</ul>
+							</div>
+						</div>
 					</dl>
 				</dt>
 			</dl>
