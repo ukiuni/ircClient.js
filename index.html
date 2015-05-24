@@ -2,7 +2,7 @@
 <html ng-app="ircApp" ng-controller="ircController">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>{{server.name}}</title>
+<title>AIRC</title>
 <script>
 	var exportsObject = module.exports;
 	module.exports = null;
@@ -14,7 +14,6 @@
 <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap-theme.min.css">
 <script src="node_modules/angular/angular.js"></script>
 <link rel="stylesheet" href="angular-ui-tree/dist/angular-ui-tree.min.css">
-<script src="angular-ui-tree/dist/angular-ui-tree.min.js"></script>
 <script src="ui-bootstrap-tpls-0.13.0.min.js"></script>
 <script src="ng-context-menu.js"></script>
 <link rel="stylesheet" href="css/index.css">
@@ -41,8 +40,8 @@
 		<div class="col-xs-4" id="userArea">
 			<div ui-tree>
 				<div ng-repeat="user in users[currentHost + ':' + currentChannel]">
-					<div context-menu data-target="menu-{{ $index }}" ng-bind="user"></div>
-					<div class="dropdown position-fixed" id="menu-{{ $index }}">
+					<div context-menu data-target="userMenu-{{ $index }}" ng-bind="user"></div>
+					<div class="dropdown position-fixed" id="userMenu-{{ $index }}">
 						<ul class="dropdown-menu" role="menu">
 							<li><a class="pointer" role="menuitem" tabindex="1" ng-click="startPrivateMessage(currentHost, user)"> Private Message</a></li>
 						</ul>
@@ -73,17 +72,25 @@
 			</div>
 		</div>
 		<!-- logArea -->
-		<div class="col-xs-4" id="channelArea">
-			<div ui-tree>
-				<dl ui-tree-nodes="" ng-model="connections.servers">
-					<dt ng-repeat="server in connections.servers" ui-tree-node>
-						<div ui-tree-handle class="serverElement" ng-bind="server.name"></div>
-						<dl ui-tree-nodes="" ng-model="server.channels">
-							<dt ng-repeat="channel in server.channels" ui-tree-node ng-click="selectChannel(server.network, channel)" class="channelElement" ng-class="{hasNewMessage: hasNewMessage(server.network, channel), isSelectChannel: isSelectChannel(server.network, channel),  hasNotificationMessage: hasNotificationMessage(server.network, channel)}" ng-bind="channel"></dt>
-						</dl>
-					</dt>
-				</dl>
-			</div>
+		<div class="col-xs-4" id="channelArea" context-menu data-target="channelAreaContextMenu">
+			<dl>
+				<dt ng-repeat="server in connections.servers">
+					<div context-menu data-target="serverMenu-{{ $index }}" class="serverElement" ng-bind="server.name"></div>
+					<div class="dropdown position-fixed" id="serverMenu-{{ $index }}">
+						<ul class="dropdown-menu" role="menu">
+							<li><a class="pointer" role="menuitem" tabindex="1" ng-click="openAddChannelDialog(server.network)">Add channel</a></li>
+						</ul>
+					</div>
+					<dl>
+						<dt ng-repeat="channel in server.channels track by $index" ng-click="selectChannel(server.network, channel)" class="channelElement" ng-class="{hasNewMessage: hasNewMessage(server.network, channel), isSelectChannel: isSelectChannel(server.network, channel),  hasNotificationMessage: hasNotificationMessage(server.network, channel)}" ng-bind="channel"></dt>
+					</dl>
+				</dt>
+			</dl>
+		</div>
+		<div class="dropdown position-fixed" id="channelAreaContextMenu">
+			<ul class="dropdown-menu" role="menu">
+				<li><a class="pointer" role="menuitem" tabindex="1" ng-click="openAddServerDialog()">Add Server</a></li>
+			</ul>
 		</div>
 		<!-- channelArea -->
 	</div>

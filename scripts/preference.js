@@ -1,14 +1,14 @@
 var storage = require('node-persist');
 storage.initSync({
-	dir : 'preference',
+	dir : '../../../persist',
 	encoding : 'utf8'
 });
 var preference = {
-	save : function(key) {
-		storage.getItem(key);
+	load : function(key) {
+		return storage.getItemSync(key);
 	},
-	load : function(key, value) {
-		storage.setItem(key, value);
+	save : function(key, value) {
+		storage.setItemSync(key, value);
 	}
 };
 module.exports = preference;
