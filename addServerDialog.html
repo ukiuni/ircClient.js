@@ -1,0 +1,18 @@
+<div class="modal-body">
+	<div class="row">
+		<div>Add Server</div>
+		<div>
+			<input type="text" class="form-control" ng-model="newServer.name" required class="form-control" style="width: 96%; margin: 2%" placeholder="name" />
+		</div>
+		<div>
+			<input type="text" class="form-control" ng-model="newServer.network" required class="form-control" style="width: 96%; margin: 2%" placeholder="network" />
+		</div>
+		<div>
+			<input type="number" class="form-control" ng-model="newServer.port" required class="form-control" style="width: 96%; margin: 2%" placeholder="port" />
+		</div>
+	</div>
+</div>
+<div class="modal-footer">
+	<button type="button" id="closeButton" class="btn btn-default" ng-click="$dismiss()">Close</button>
+	<button type="button" id="saveButton" class="btn btn-primary" ng-disabled="'' == newServer.name || null == newServer.name || '' == newServer.network || null == newServer.network || '' == newServer.port || null == newServer.port" ng-click="save()">Save</button>
+</div>
