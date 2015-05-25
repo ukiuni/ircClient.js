@@ -150,6 +150,9 @@ angular.module('ircApp', [ 'ng-context-menu', 'ui.bootstrap' ]).controller('ircC
 		});
 	}
 	irc.addServer = function(server) {
+		if (findServerFromList(server.network)) {
+			return;
+		}
 		var newServer = {};
 		newServer.name = server.name;
 		newServer.network = server.network;
